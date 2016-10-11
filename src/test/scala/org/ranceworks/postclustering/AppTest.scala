@@ -6,18 +6,22 @@ import java.util
 import collection.mutable.Stack
 import org.scalatest._
 import org.apache.commons.io.FileUtils
+import org.apache.spark.rdd.RDD
 import org.junit.Test
+import org.ranceworks.postclustering.token.BasicTokenizer
+
 import collection.JavaConverters._
 
 class AppTest extends FlatSpec with Matchers {
 
   "A Stack" should "pop values in last-in-first-out order" in {
      //   println(new File(getClass.getResource("C50").toURI))
-    val a: util.Collection[File] =   FileUtils.listFiles(new File(getClass.getResource("C50").toURI), Array("txt"),true)
-    //a.asScala.foreach( p => println(p.getName))
+    val files: List[File]
+      = FileUtils.listFiles(new File(getClass.getResource("C50").toURI), Array("txt"),true).asScala.toList
 
-    App.toRdd(a.asScala.toList)
+    val tokens: RDD[List[String]] =  App.toRdd(files.take(2), new BasicTokenizer)
 
+    tokens.take(2).foreach(f => println(f))
     val stack = new Stack[Int]
     stack.push(1)
     stack.push(2)

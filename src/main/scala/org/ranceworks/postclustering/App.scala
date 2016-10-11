@@ -11,6 +11,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.rdd.RDD
+import org.ranceworks.postclustering.token.Tokenizer
 
 import scala.language.postfixOps
 import collection.JavaConverters._
@@ -19,14 +20,12 @@ object App {
 
   val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
 
-  def toRdd(files : List[File]) : List[RDD[String]] = {
-
-    val b:  RDD[File] = sc.parallelize(files)
-    val c: RDD[String] = b.map(f => FileUtils.readFileToString(f, StandardCharsets.UTF_8))
-    c.take(1).foreach(f=> println(f))
-    files map (f => sc.textFile(f.getPath))
-
+  def toRdd(files : List[File], tokenizer: Tokenizer) : RDD[List[String]] = {
+    val fileRDD: RDD[String]
+      = sc.parallelize(files) map (file => FileUtils readFileToString (file, StandardCharsets.UTF_8))
+    fileRDD.map(tokenizer.tokenize)
   }
+
   def main(args: Array[String]) {
     val a: util.Collection[File] =   FileUtils.listFiles(new File(getClass.getResource("C50").toURI) ,Array("txt"),true)
   }
