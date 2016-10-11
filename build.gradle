@@ -4,14 +4,21 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'scala'
 
-sourceCompatibility = 1.5
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_2.10
-    compile group: 'org.apache.spark', name: 'spark-mllib_2.10', version: '1.3.0'
+    // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_2.11
+    compile group: 'org.apache.spark', name: 'spark-mllib_2.11', version: '2.0.1'
+    // https://mvnrepository.com/artifact/com.atilika.kuromoji/kuromoji-ipadic
+    compile group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    // https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11
+    compile group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.0'
+    // https://mvnrepository.com/artifact/org.apache.spark/spark-core_2.11
+    compile group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.0.1'
+
 }
