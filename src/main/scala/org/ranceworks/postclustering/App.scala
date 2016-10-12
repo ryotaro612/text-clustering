@@ -15,16 +15,26 @@ import org.ranceworks.postclustering.token.Tokenizer
 
 import scala.language.postfixOps
 import collection.JavaConverters._
+import scala.collection.mutable
 object App {
 
 
   val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
 
-  def toRdd(files : List[File], tokenizer: Tokenizer) : RDD[List[String]] = {
+  def toRdd(files : List[File], tokenizer: Tokenizer) : RDD[Map[String, Integer]] = {
     val fileRDD: RDD[String]
-      = sc.parallelize(files) map (file => FileUtils readFileToString (file, StandardCharsets.UTF_8))
-    fileRDD.map(tokenizer.tokenize)
+    = sc.parallelize(files) map (file => FileUtils readFileToString(file, StandardCharsets.UTF_8))
+
+    val docMap: RDD[Map[String, Integer]] = fileRDD.map(tokenizer.tokenize) map { words =>
+      words./:(Map[String, Integer]())((map: Map[String, Integer], word: String) => {
+        map contains word match {
+          case true => map + (word -> (map(word) + 1))
+          case false => map + (word -> 1)
+        }})
+    }
+    docMap
   }
+
 
   def main(args: Array[String]) {
     val a: util.Collection[File] =   FileUtils.listFiles(new File(getClass.getResource("C50").toURI) ,Array("txt"),true)
