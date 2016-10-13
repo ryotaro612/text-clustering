@@ -21,12 +21,12 @@ object App {
 
   val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
 
-  def toRdd(files : List[File], tokenizer: Tokenizer) : RDD[Map[String, Integer]] = {
+  def toRdd(files : List[File], tokenizer: Tokenizer) : RDD[Map[String, Int]] = {
     val fileRDD: RDD[String]
     = sc.parallelize(files) map (file => FileUtils readFileToString(file, StandardCharsets.UTF_8))
 
-    val docMap: RDD[Map[String, Integer]] = fileRDD.map(tokenizer.tokenize) map { words =>
-      words./:(Map[String, Integer]())((map: Map[String, Integer], word: String) => {
+    val docMap: RDD[Map[String, Int]] = fileRDD.map(tokenizer.tokenize) map { words =>
+      words./:(Map[String, Int]())((map: Map[String, Int], word: String) => {
         map contains word match {
           case true => map + (word -> (map(word) + 1))
           case false => map + (word -> 1)
@@ -35,6 +35,14 @@ object App {
     docMap
   }
 
+  def createDocMatrix(docMap: RDD[Map[String, Int]]) = {
+    docMap.reduce((mapA: Map[String, Int], mapB: Map[String, Int]) => {
+      mapA./:(mapB)((mapB: Map[String, Int], mapAKeyVal) => {
+        val diffMap: Map[String, Int] = (mapA -- mapB.keys) ++ (mapB -- mapA.keys)
+        (mapA.keySet intersect mapB.keySet)./:(diffMap)((map, key) => map + (key -> (mapA(key) + mapB(key))))
+      })
+    })
+  }
 
   def main(args: Array[String]) {
     val a: util.Collection[File] =   FileUtils.listFiles(new File(getClass.getResource("C50").toURI) ,Array("txt"),true)
