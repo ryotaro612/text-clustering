@@ -4,7 +4,6 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util
-
 import org.apache.commons.io.FileUtils
 import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
@@ -12,7 +11,6 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.rdd.RDD
 import org.ranceworks.postclustering.token.Tokenizer
-
 import scala.language.postfixOps
 import collection.JavaConverters._
 import scala.collection.mutable
@@ -35,13 +33,12 @@ object App {
     docMap
   }
 
-  def createDocMatrix(docMap: RDD[Map[String, Int]]) = {
-    docMap.reduce((mapA: Map[String, Int], mapB: Map[String, Int]) => {
-      mapA./:(mapB)((mapB: Map[String, Int], mapAKeyVal) => {
-        val diffMap: Map[String, Int] = (mapA -- mapB.keys) ++ (mapB -- mapA.keys)
-        (mapA.keySet intersect mapB.keySet)./:(diffMap)((map, key) => map + (key -> (mapA(key) + mapB(key))))
-      })
-    })
+  def createDocMatrix(docMap: RDD[Map[String, Int]]): RDD[Vector] = {
+    val allWords: List[String]
+      = docMap.map(map => map.keySet).reduce((wordSetA, wordSetB) => wordSetA ++ wordSetB).toList
+    docMap.map(map =>
+      Vectors.dense(allWords.map(word => map.applyOrElse(word, (word: String) => 0).toDouble).toArray)
+    )
   }
 
   def main(args: Array[String]) {

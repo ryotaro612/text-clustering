@@ -1,8 +1,7 @@
 package org.ranceworks.postclustering.token
 
-/**
-  * Created by kzs on 2016/10/11.
-  */
+import org.tartarus.snowball.ext.EnglishStemmer
+
 class BasicTokenizer extends  Tokenizer {
   override def tokenize(text: String): List[String] =  {
     text.split("\\s+").toList
