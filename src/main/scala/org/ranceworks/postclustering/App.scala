@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util
+
 import org.apache.commons.io.FileUtils
 import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
@@ -11,6 +12,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.rdd.RDD
 import org.ranceworks.postclustering.token.Tokenizer
+import org.ranceworks.postclustering.vo.Doc
+
 import scala.language.postfixOps
 import collection.JavaConverters._
 import scala.collection.mutable
@@ -76,3 +79,54 @@ object App {
     //val sameModel = KMeansModel.load(sc, "target/org/apache/spark/KMeansExample/KMeansModel")
   }
 }
+
+
+class DocBuilder(sc: SparkContext) {
+  def toRdd(files : List[File], tokenizer: Tokenizer): RDD[Doc] = {
+    val fileRDD: RDD[(String, String)]
+    = sc.parallelize(files) map (file =>
+      (file.getAbsolutePath, FileUtils readFileToString(file, StandardCharsets.UTF_8)))
+    fileRDD.map((a: (String, String)) => (a._1, tokenizer.tokenize(a._2))).map {(tuple: (String, List[String])) =>
+      val mp = tuple._2./:(Map[String, Int]())((map: Map[String, Int], word: String) => {
+        map contains word match {
+          case true => map + (word -> (map(word) + 1))
+          case false => map + (word -> 1)
+        }})
+      Doc(tuple._1, mp)
+    }
+  }
+  def createDocMatrix = ???
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
