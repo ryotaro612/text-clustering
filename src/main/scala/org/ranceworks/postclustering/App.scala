@@ -46,6 +46,7 @@ object App {
 
   def main(args: Array[String]) {
     val a: util.Collection[File] =   FileUtils.listFiles(new File(getClass.getResource("C50").toURI) ,Array("txt"),true)
+
   }
 
 
@@ -82,6 +83,7 @@ object App {
 
 
 class DocBuilder(sc: SparkContext) {
+
   def toRdd(files : List[File], tokenizer: Tokenizer): RDD[Doc] = {
     val fileRDD: RDD[(String, String)]
     = sc.parallelize(files) map (file =>
@@ -95,7 +97,11 @@ class DocBuilder(sc: SparkContext) {
       Doc(tuple._1, mp)
     }
   }
-  def createDocMatrix = ???
+
+  def createDocMatrix(docs: RDD[Doc]): RDD[Vector] = {
+    val allwords= docs.map(doc => doc.wordOccurMap.keySet).reduce((k1,k2) => k1 ++ k2).toList
+    docs.map(doc => Vectors.dense(allwords.map(w => doc.wordOccurMap.applyOrElse(w, (word: String)=> 0).toDouble).toArray ))
+  }
 }
 
 

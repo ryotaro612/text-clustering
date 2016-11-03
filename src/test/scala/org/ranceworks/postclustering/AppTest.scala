@@ -11,6 +11,7 @@ import org.apache.lucene.analysis.core.StopFilterFactory
 import org.apache.lucene.analysis.en.EnglishAnalyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.analysis.tokenattributes.{CharTermAttribute, CharTermAttributeImpl, OffsetAttribute, OffsetAttributeImpl}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.junit.Test
 import org.ranceworks.postclustering.token.{BasicTokenizer, EnglishTokenizer}
@@ -23,6 +24,14 @@ class AppTest extends FlatSpec with Matchers {
   "EnglishTokenizer" should "tokenize english sentence" in {
     val tokens = new EnglishTokenizer().tokenize("Fortune favors the bold")
     assert(tokens == List("fortun", "favor", "bold"))
+
+
+    println(new File(getClass.getResource("C50").toURI).exists())
+    //val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
+
+    //val builder = new DocBuilder(sc)
+    //builder.toRdd(, new EnglishTokenizer)
+
   }
 
   it should "throw NoSuchElementException if an empty stack is popped" in {

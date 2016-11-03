@@ -22,6 +22,4 @@ dependencies {
     compile group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.0.1'
     // https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '6.2.1'
-
-
 }
