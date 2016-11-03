@@ -10,7 +10,7 @@ import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
-import org.ranceworks.postclustering.token.EnglishTokenizer
+import org.ranceworks.postclustering.token.{EnglishTokenizer, JapaneseTokenizer}
 
 import collection.JavaConverters._
 import org.ranceworks.postclustering.vo.Doc
@@ -19,6 +19,8 @@ class AppTest extends FlatSpec with Matchers {
 
   "EnglishTokenizer" should "tokenize english sentence" in {
 
+   println( new JapaneseTokenizer().tokenize("犬も歩けば棒に当たる"))
+    /*
     println(new File(getClass.getResource("C50").toURI).exists())
 
     val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
@@ -47,6 +49,7 @@ class AppTest extends FlatSpec with Matchers {
       //println(f"${tuple._2.toArray.mkString("[", ", ", "]")}%s " +
       // f"(${tuple._1}%s) : cluster = ${clusters.predict(tuple._2)}%d")
     }
+    */
   }
 
   it should "throw NoSuchElementException if an empty stack is popped" in {
