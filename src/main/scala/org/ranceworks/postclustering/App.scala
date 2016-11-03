@@ -2,21 +2,17 @@ package org.ranceworks.postclustering
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.util
 
 import org.apache.commons.io.FileUtils
 import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.rdd.RDD
 import org.ranceworks.postclustering.token.Tokenizer
 import org.ranceworks.postclustering.vo.Doc
 
 import scala.language.postfixOps
-import collection.JavaConverters._
-import scala.collection.mutable
 object App {
 
 
@@ -98,9 +94,10 @@ class DocBuilder(sc: SparkContext) {
     }
   }
 
-  def createDocMatrix(docs: RDD[Doc]): RDD[Vector] = {
-    val allwords= docs.map(doc => doc.wordOccurMap.keySet).reduce((k1,k2) => k1 ++ k2).toList
-    docs.map(doc => Vectors.dense(allwords.map(w => doc.wordOccurMap.applyOrElse(w, (word: String)=> 0).toDouble).toArray ))
+  def createDocMatrix(docs: RDD[Doc]): RDD[(String, Vector)] = {
+    val allWords: List[String] = docs.map(doc => doc.wordOccurMap.keySet).reduce((k1,k2) => k1 ++ k2).toList
+    docs.map(doc =>
+      (doc.id, Vectors.dense(allWords.map(w => doc.wordOccurMap.applyOrElse(w, (word: String)=> 0).toDouble).toArray)))
   }
 }
 

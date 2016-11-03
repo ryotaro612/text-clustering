@@ -1,37 +1,52 @@
 package org.ranceworks.postclustering
 
-import java.io.{File, StringReader}
+import java.io.File
 import java.util
 
 import collection.mutable.Stack
 import org.scalatest._
 import org.apache.commons.io.FileUtils
-import org.apache.lucene.analysis.{TokenFilter, TokenStream}
-import org.apache.lucene.analysis.core.StopFilterFactory
-import org.apache.lucene.analysis.en.EnglishAnalyzer
-import org.apache.lucene.analysis.standard.StandardAnalyzer
-import org.apache.lucene.analysis.tokenattributes.{CharTermAttribute, CharTermAttributeImpl, OffsetAttribute, OffsetAttributeImpl}
+import org.apache.spark.mllib.clustering.KMeans
+import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
-import org.junit.Test
-import org.ranceworks.postclustering.token.{BasicTokenizer, EnglishTokenizer}
-import org.tartarus.snowball.ext.PorterStemmer
+import org.ranceworks.postclustering.token.EnglishTokenizer
 
 import collection.JavaConverters._
+import org.ranceworks.postclustering.vo.Doc
 
 class AppTest extends FlatSpec with Matchers {
 
   "EnglishTokenizer" should "tokenize english sentence" in {
-    val tokens = new EnglishTokenizer().tokenize("Fortune favors the bold")
-    assert(tokens == List("fortun", "favor", "bold"))
-
 
     println(new File(getClass.getResource("C50").toURI).exists())
-    //val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
 
-    //val builder = new DocBuilder(sc)
-    //builder.toRdd(, new EnglishTokenizer)
+    val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
 
+    val a: util.Collection[File] =
+      FileUtils.listFiles(new File(getClass.getResource("C50/C50test").toURI) ,Array("txt"),true)
+
+    val builder = new DocBuilder(sc)
+
+    val docs: RDD[Doc] = builder.toRdd(a.asScala.toList, new EnglishTokenizer)
+
+    val pData: RDD[(String, Vector)] = builder.createDocMatrix(docs)
+    val parsedData: RDD[Vector] = pData.map(p=> p._2)
+
+    val clusters = KMeans.train(parsedData, 50, 20)
+
+    val WSSSE = clusters.computeCost(parsedData)
+    println("Within Set Sum of Squared Errors = " + WSSSE)
+
+    clusters.clusterCenters.foreach {
+      center => println(f"${center.toArray.mkString("[", ", ", "]")}%s")
+    }
+
+    parsedData.foreach { tuple =>
+      println( clusters.predict(tuple))
+      //println(f"${tuple._2.toArray.mkString("[", ", ", "]")}%s " +
+      // f"(${tuple._1}%s) : cluster = ${clusters.predict(tuple._2)}%d")
+    }
   }
 
   it should "throw NoSuchElementException if an empty stack is popped" in {
