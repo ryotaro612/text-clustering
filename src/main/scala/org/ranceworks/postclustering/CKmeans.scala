@@ -11,6 +11,7 @@ import org.apache.spark.rdd.RDD
 import org.ranceworks.postclustering.token.Tokenizer
 import org.ranceworks.postclustering.vo.{Doc, DocVec}
 
+import scala.collection.JavaConverters
 import scala.language.postfixOps
 
 object CKMeans {
