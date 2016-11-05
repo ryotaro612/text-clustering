@@ -7,6 +7,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import scala.annotation.tailrec
 
 class EnglishTokenizer extends Tokenizer {
+
   override def tokenize(text: String): List[String] = {
     val analyzer = new EnglishAnalyzer()
     val tokenStream: TokenStream =  analyzer.tokenStream(this.getClass.getName, text)
