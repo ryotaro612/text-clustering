@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    // https://mvnrepository.com/artifact/org.scala-lang/scala-library
+    compile group: 'org.scala-lang', name: 'scala-library', version: '2.12.0'
     // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_2.11
     compile group: 'org.apache.spark', name: 'spark-mllib_2.11', version: '2.0.1'
     // https://mvnrepository.com/artifact/com.atilika.kuromoji/kuromoji-ipadic
@@ -25,5 +26,5 @@ dependencies {
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '6.2.1'
     // https://mvnrepository.com/artifact/com.atilika.kuromoji/kuromoji-ipadic
     compile group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
-
+    testCompile group: 'junit', name: 'junit', version: '4.11'
 }
