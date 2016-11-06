@@ -42,21 +42,24 @@ class DocBuilder(sc: SparkContext) {
       DocVec(doc.id,
         Vectors.dense(allWords.map(w => doc.wordOccurMap.applyOrElse(w, (word: String)=> 0).toDouble).toArray)))
   }
-  def toRdd(texts : Map[String, String], tokenizer: Tokenizer): RDD[Doc] = {
-    sc.parallelize(texts.toSeq).map(idText => Doc(idText._1, countWords(tokenizer.tokenize(idText._2))))
-  }
-
-  private def countWords(words: List[String]): Map[String, Int]  = {
-    words./:(Map[String, Int]())((mp, word) => mp contains word match {
-      case true => mp + (word -> (mp(word) + 1))
-      case false => mp + (word -> 1)
-    })
+  private def toRdd(texts : Map[String, String], tokenizer: Tokenizer): RDD[Doc] = {
+    sc.parallelize(texts.toSeq).map(idText => Doc(idText._1, DocBuilder.countWords(tokenizer.tokenize(idText._2))))
   }
 
   private def toRdd(files : List[File], tokenizer: Tokenizer): RDD[Doc] = {
     val fileRDD: RDD[(String, String)]
     = sc.parallelize(files) map (file =>
       (file.getAbsolutePath, FileUtils readFileToString(file, StandardCharsets.UTF_8)))
-    fileRDD.map((tuple: (String, String)) => Doc(tuple._1, countWords(tokenizer.tokenize(tuple._2))))
+    fileRDD.map((tuple: (String, String)) => Doc(tuple._1,
+     DocBuilder.countWords(tokenizer.tokenize(tuple._2)) ))
   }
 }
+object DocBuilder {
+  private def countWords(words: List[String]): Map[String, Int]  = {
+    words./:(Map[String, Int]())((mp, word) => mp contains word match {
+      case true => mp + (word -> (mp(word) + 1))
+      case false => mp + (word -> 1)
+    })
+  }
+}
+

@@ -18,8 +18,8 @@ import org.ranceworks.postclustering.vo.Doc
 class AppTest extends FlatSpec with Matchers {
 
   "EnglishTokenizer" should "tokenize english sentence" in {
-    /*
 
+    /*
    println( new JapaneseTokenizer().tokenize("犬も歩けば棒に当たる"))
 
     val sc  = new SparkContext(new SparkConf() setAppName "postclustering" setMaster "local")
@@ -30,7 +30,7 @@ class AppTest extends FlatSpec with Matchers {
     val builder = new DocBuilder(sc)
 
     val matrix =  builder.buildMatrix(a.asScala.toList, new EnglishTokenizer())
-    val mp: Map[String, Int] = ClusteringKMeans.run(matrix, 50, 20)
+    val mp: Map[String, Int] = CKMeans.run(matrix, 50, 20)
 
     mp.foreach { m =>
       println(m._1 + "->"  + m._2)
